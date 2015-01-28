@@ -1,0 +1,7 @@
+parameters:
+    teneleven.form.extension.dependency.class: Teneleven\Bundle\FormDependencyBundle\Form\Extension\DependencyExtension
+
+services:
+    teneleven.form.extension.dependency:
+        class: %teneleven.form.extension.dependency.class%
+        tags: [{ name: form.type_extension, alias: form }]

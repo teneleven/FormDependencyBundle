@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class DependencyListener implements EventSubscriberInterface
 {
     /**
-     * Add new validation constraints
+     * Add new validation constraints.
      *
      * @param FormEvent $event
      */
@@ -40,7 +40,7 @@ class DependencyListener implements EventSubscriberInterface
 
     /**
      * Recursively loops through all widgets and those with 'depends_on' option
-     * get consumed by self::processDependency
+     * get consumed by self::processDependency.
      */
     protected function processDependencies($form, $data)
     {
@@ -57,7 +57,7 @@ class DependencyListener implements EventSubscriberInterface
     }
 
     /**
-     * Process a dependency and add/remove validation NotBlank constraints
+     * Process a dependency and add/remove validation NotBlank constraints.
      */
     protected function processDependency($widget, $data)
     {
@@ -99,7 +99,7 @@ class DependencyListener implements EventSubscriberInterface
     }
 
     /**
-     * Add required constraint to a form child
+     * Add required constraint to a form child.
      *
      * @param FormInterface $widget
      *
@@ -124,7 +124,7 @@ class DependencyListener implements EventSubscriberInterface
     }
 
     /**
-     * Remove required constraint to a form child
+     * Remove required constraint to a form child.
      *
      * @param FormInterface $widget
      *

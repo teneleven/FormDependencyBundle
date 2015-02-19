@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * Loads and manages bundle configuration
+ * Loads and manages bundle configuration.
  */
 class TenelevenFormDependencyExtension extends Extension
 {

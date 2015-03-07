@@ -13,7 +13,7 @@ use Teneleven\Bundle\FormDependencyBundle\Form\EventListener\DependencyListener;
  * Adds 'depends_on' option for form fields who depend on others. Most of the
  * work is done in the DependencyListener event subscriber.
  */
-class DependencyExtension extends AbstractTypeExtension
+final class DependencyExtension extends AbstractTypeExtension
 {
     /**
      * {@inheritdoc}

@@ -51,7 +51,7 @@ class DependencyListener implements EventSubscriberInterface
             }
 
             if ($widget->getConfig()->getCompound()) {
-                $this->processDependencies($widget, isset($data[$name]) ? $data[$name] : null);
+                $this->processDependencies($widget, is_array($data) && isset($data[$name]) ? $data[$name] : null);
             }
         }
     }

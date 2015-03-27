@@ -83,7 +83,7 @@ class DependencyListener implements EventSubscriberInterface
      * @param mixed $value
      * @param mixed $match
      *
-     * @return boolean
+     * @return bool
      */
     protected function dependencyMatches($value, $match = null)
     {

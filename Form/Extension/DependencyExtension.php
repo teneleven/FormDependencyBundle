@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Teneleven\Bundle\FormDependencyBundle\Form\EventListener\DependencyListener;
 
 /**
- * Adds 'depends_on' option for form fields who depend on others. Most of the
+ * Adds 'depends_on' option for form fields which depend on others. Most of the
  * work is done in the DependencyListener event subscriber.
  */
 final class DependencyExtension extends AbstractTypeExtension
@@ -20,9 +20,7 @@ final class DependencyExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($builder->getCompound()) {
-            $builder->addEventSubscriber(new DependencyListener());
-        }
+        $builder->addEventSubscriber(new DependencyListener());
     }
 
     /**
@@ -30,7 +28,8 @@ final class DependencyExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['dependencies'] = $options['dependencies'];
+        // todo here we might want to do some pre-processing.
+        $view->vars['depends_on'] = $options['depends_on'];
     }
 
     /**
@@ -39,8 +38,17 @@ final class DependencyExtension extends AbstractTypeExtension
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'dependencies' => [],
             'depends_on' => null,
+        ]);
+
+        $resolver->setNormalizers([
+            'depends_on' => function($options, $value) {
+                if (is_scalar($value)) {
+                    return [$value => null];
+                }
+
+                return $value;
+            }
         ]);
     }
 

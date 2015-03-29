@@ -6,7 +6,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
@@ -75,8 +74,6 @@ class DependencyListener implements EventSubscriberInterface
         } else {
             $this->removeConstraint($widget);
         }
-
-        $this->addDependency($widget->getParent()->get($key), $value);
     }
 
     /**
@@ -133,7 +130,6 @@ class DependencyListener implements EventSubscriberInterface
     protected function removeConstraint(FormInterface $widget)
     {
         $config = $widget->getConfig();
-        $type = $config->getType()->getName();
         $options = $config->getOptions();
         $options['required'] = false;
 
@@ -146,34 +142,6 @@ class DependencyListener implements EventSubscriberInterface
         }
 
         return $this->changeWidgetOptions($widget, $options);
-    }
-
-    /**
-     * Add dependency to form widget 'dependencies' list, for use in the view &
-     * javascript (better) collapse.
-     *
-     * @param FormInterface $widget
-     * @param mixed         $value
-     *
-     * @return FormInterface
-     */
-    protected function addDependency(FormInterface $dependency, $value)
-    {
-        $config = $dependency->getConfig();
-        $type = $config->getType()->getName();
-        $options = $config->getOptions();
-
-        if (!$options['dependencies']) {
-            $options['dependencies'] = [];
-        }
-
-        if ($value === null) {
-            $options['dependencies'] = true;
-        } elseif (!in_array($value, $options['dependencies'])) {
-            $options['dependencies'][] = $value;
-        }
-
-        return $this->changeWidgetOptions($dependency, $options);
     }
 
     /**

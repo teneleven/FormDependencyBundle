@@ -45,12 +45,13 @@ class DependencyListener implements EventSubscriberInterface
      */
     protected function processDependencies($form, $data)
     {
-        foreach ($form as $name => $widget) {
+        foreach ($form as $name => $widget) { /** @var Form $widget */
             // get reverse side of dependency
             if ($widget->getConfig()->getOption('depends_on')) {
                 $this->processDependency($widget, $data);
             }
 
+            // todo consider if compound needs to be included
             if ($widget->getConfig()->getCompound()) {
                 $this->processDependencies($widget, is_array($data) && isset($data[$name]) ? $data[$name] : null);
             }
@@ -64,7 +65,7 @@ class DependencyListener implements EventSubscriberInterface
     {
         $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
 
-        if (is_array($data) && array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
+        if ($dependency->isRequired() && is_array($data) && array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
             $this->addConstraint($widget);
         } else {
             $this->removeConstraint($widget);

@@ -29,7 +29,6 @@ final class DependencyExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        // todo here we might want to do some pre-processing.
         $view->vars['depends_on'] = isset($options['depends_on']) ? $options['depends_on'] : false;
     }
 

@@ -64,7 +64,7 @@ class DependencyListener implements EventSubscriberInterface
     {
         $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
 
-        if (array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
+        if (is_array($data) && array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
             $this->addConstraint($widget);
         } else {
             $this->removeConstraint($widget);

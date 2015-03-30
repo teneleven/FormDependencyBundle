@@ -3,10 +3,12 @@
 namespace Teneleven\Bundle\FormDependencyBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Teneleven\Bundle\FormDependencyBundle\Form\Dependency;
 
 /**
  * Listens to FormEvents to add validation constraints to dependencies.
@@ -58,41 +60,15 @@ class DependencyListener implements EventSubscriberInterface
     /**
      * Process a dependency and add/remove validation NotBlank constraints.
      */
-    protected function processDependency($widget, $data)
+    protected function processDependency(Form $widget, $data)
     {
-        $key = $widget->getConfig()->getOption('depends_on');
-        $value = null;
+        $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
 
-        // split if array
-        if (is_array($key)) {
-            $value = current(array_values($key));
-            $key = current(array_keys($key));
-        }
-
-        if (isset($data[$key]) && $this->dependencyMatches($data[$key], $value)) {
+        if (array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
             $this->addConstraint($widget);
         } else {
             $this->removeConstraint($widget);
         }
-    }
-
-    /**
-     * @param mixed $value
-     * @param mixed $match
-     *
-     * @return bool
-     */
-    protected function dependencyMatches($value, $match = null)
-    {
-        if (is_array($value)) {
-            return ($match === null && count($value))
-                || ($match !== null && in_array($match, $value))
-            ;
-        }
-
-        return ($match === null && $value !== '')
-            || ($match !== null && $value == $match)
-        ;
     }
 
     /**

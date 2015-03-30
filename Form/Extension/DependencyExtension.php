@@ -38,7 +38,7 @@ final class DependencyExtension extends AbstractTypeExtension
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional([
-            'depends_on'
+            'depends_on',
         ]);
 
         $resolver->setAllowedTypes([

@@ -31,10 +31,10 @@ final class Dependency
     private $required;
 
     /**
-     * @param string $field
+     * @param string      $field
      * @param string|null $value
      * @param string|null $matchType
-     * @param bool $required
+     * @param bool        $required
      */
     public function __construct($field, $value, $matchType = null, $required = true)
     {
@@ -82,7 +82,6 @@ final class Dependency
     }
 
     /**
-     * @return null
      */
     public function getMatchType()
     {
@@ -90,7 +89,6 @@ final class Dependency
     }
 
     /**
-     * @return null
      */
     public function getValue()
     {
@@ -98,7 +96,7 @@ final class Dependency
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isRequired()
     {
@@ -107,6 +105,7 @@ final class Dependency
 
     /**
      * @param mixed $value
+     *
      * @return bool
      */
     public function matches($value)

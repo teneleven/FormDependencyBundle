@@ -64,7 +64,6 @@ class DependencyListener implements EventSubscriberInterface
     protected function processDependency(Form $widget, $data)
     {
         $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
-
         if ($dependency->isRequired() && is_array($data) && array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
             $this->addConstraint($widget);
         } else {

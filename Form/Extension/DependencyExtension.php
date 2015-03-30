@@ -41,7 +41,7 @@ final class DependencyExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $dependency = $field->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
+            $dependency = $field->getConfig()->getOption('depends_on'); /* @var Dependency $dependency */
             $dependentView = $view->children[$dependency->getField()];
 
             $dependentName = $dependentView->vars['full_name'];
@@ -50,7 +50,7 @@ final class DependencyExtension extends AbstractTypeExtension
             }
 
             $view->children[$key]->vars['depends_on'] = [
-                'field' => $dependentName, 'value' => $dependency->getValue(), 'match_type' => $dependency->getMatchType()
+                'field' => $dependentName, 'value' => $dependency->getValue(), 'match_type' => $dependency->getMatchType(),
             ];
         }
     }

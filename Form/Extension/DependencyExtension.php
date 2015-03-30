@@ -35,6 +35,28 @@ final class DependencyExtension extends AbstractTypeExtension
     /**
      * {@inheritdoc}
      */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        foreach ($form as $key => $field) { /** @var FormInterface $field */
+            if ($field->getConfig()->hasOption('depends_on')) {
+                $dependency = $field->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
+                $dependentView = $view->children[$dependency->getField()];
+
+                $dependentName = $dependentView->vars['full_name'];
+                if (!empty($dependentView->vars['multiple']) && $dependentView->vars['expanded']) {
+                    $dependentName .= '[]';
+                }
+
+                $view->children[$key]->vars['depends_on'] = [
+                    'field' => $dependentName, 'value' => $dependency->getValue(), 'match_type' => $dependency->getMatchType()
+                ];
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional([

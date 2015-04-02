@@ -25,7 +25,11 @@ class DependencyListener implements EventSubscriberInterface
         $form = $event->getForm();
         $data = (array) $event->getData();
 
-        $this->processDependencies($form, $data);
+        foreach ($form as $field) { /** @var FormInterface $field */
+            if ($field->getConfig()->hasOption('depends_on')) {
+                $this->processDependency($field, $data);
+            }
+        }
     }
 
     /**
@@ -37,25 +41,6 @@ class DependencyListener implements EventSubscriberInterface
             FormEvents::PRE_SET_DATA => 'handleDependencies',
             FormEvents::PRE_SUBMIT => 'handleDependencies',
         ];
-    }
-
-    /**
-     * Recursively loops through all widgets and those with 'depends_on' option
-     * get consumed by self::processDependency.
-     */
-    protected function processDependencies($form, $data)
-    {
-        foreach ($form as $name => $widget) { /** @var Form $widget */
-            // get reverse side of dependency
-            if ($widget->getConfig()->getOption('depends_on')) {
-                $this->processDependency($widget, $data);
-            }
-
-            // todo consider if compound needs to be included
-            if ($widget->getConfig()->getCompound()) {
-                $this->processDependencies($widget, is_array($data) && isset($data[$name]) ? $data[$name] : null);
-            }
-        }
     }
 
     /**
@@ -135,10 +120,18 @@ class DependencyListener implements EventSubscriberInterface
         $config = $widget->getConfig();
         $options = array_merge($config->getOptions(), $options);
 
-        return $form->add(
+        $children = $form->all();
+
+        $widget = $form->add(
             $widget->getName(),
             $config->getType()->getName(),
             $options
         );
+
+        foreach ($children as $child) {
+            $widget->add($child);
+        }
+
+        return $widget;
     }
 }

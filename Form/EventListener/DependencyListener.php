@@ -119,14 +119,15 @@ class DependencyListener implements EventSubscriberInterface
         $form = $widget->getParent();
         $config = $widget->getConfig();
         $options = array_merge($config->getOptions(), $options);
+        $children = $widget->all();
 
-        $children = $form->all();
-
-        $widget = $form->add(
+        $form->add(
             $widget->getName(),
             $config->getType()->getName(),
             $options
         );
+
+        $widget = $form->get($widget->getName()); /** @var FormInterface $child */
 
         foreach ($children as $child) {
             $widget->add($child);

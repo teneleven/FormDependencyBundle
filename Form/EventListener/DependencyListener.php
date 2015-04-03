@@ -70,10 +70,8 @@ class DependencyListener implements EventSubscriberInterface
         $options['required'] = true;
 
         // don't duplicate constraints
-        foreach ($options['constraints'] as $existingConstraint) {
-            if ($existingConstraint instanceof NotBlank) {
-                return;
-            }
+        if ($this->isWidgetRequired($widget)) {
+            return;
         }
 
         $options['constraints'] = array_merge((array) $options['constraints'], [new NotBlank()]);
@@ -128,10 +126,37 @@ class DependencyListener implements EventSubscriberInterface
         );
 
         $widget = $form->get($widget->getName()); /** @var FormInterface $child */
+        $required = $this->isWidgetRequired($widget);
+
         foreach ($children as $child) {
             $widget->add($child);
+
+            $child = $widget->get($child->getName());
+            $type = $child->getConfig()->getType()->getName();
+
+            if ($required && !in_array($type, ['radio', 'select', 'checkbox'])) {
+                $this->addConstraint($child);
+            } else {
+                $this->removeConstraint($child);
+            }
         }
 
         return $widget;
+    }
+
+    /**
+     * @param FormInterface $widget
+     *
+     * @return boolean
+     */
+    public function isWidgetRequired(FormInterface $widget)
+    {
+        foreach ($widget->getConfig()->getOptions()['constraints'] as $existingConstraint) {
+            if ($existingConstraint instanceof NotBlank) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

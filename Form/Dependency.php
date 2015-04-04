@@ -104,6 +104,14 @@ final class Dependency
     }
 
     /**
+     * @param bool $required
+     */
+    public function setRequired($required)
+    {
+        $this->required = $required;
+    }
+
+    /**
      * @param mixed $value
      *
      * @return bool

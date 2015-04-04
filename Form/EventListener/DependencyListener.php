@@ -3,7 +3,6 @@
 namespace Teneleven\Bundle\FormDependencyBundle\Form\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -46,15 +45,26 @@ class DependencyListener implements EventSubscriberInterface
     /**
      * Process a dependency and add/remove validation NotBlank constraints.
      */
-    protected function processDependency(Form $widget, $data)
+    protected function processDependency(FormInterface $widget, $data)
     {
         $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
-        if ($dependency->isRequired() && is_array($data) && array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()])) {
+        if ($dependency->isRequired() && $this->dependencyMatches($dependency, $data)) {
             $this->addConstraint($widget);
         } else {
             $this->removeConstraint($widget);
         }
     }
+
+    /**
+     * @param Dependency $dependency
+     * @param array $data
+     * @return bool
+     */
+    protected function dependencyMatches(Dependency $dependency, array $data)
+    {
+        return array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()]);
+    }
+
 
     /**
      * Add required constraint to a form child.
@@ -65,15 +75,12 @@ class DependencyListener implements EventSubscriberInterface
      */
     protected function addConstraint(FormInterface $widget)
     {
-        $config = $widget->getConfig();
-        $options = $config->getOptions();
-        $options['required'] = true;
-
-        // don't duplicate constraints
         if ($this->isWidgetRequired($widget)) {
-            return;
+            return; // don't duplicate constraints
         }
 
+        $options = $widget->getConfig()->getOptions();
+        $options['required'] = true;
         $options['constraints'] = array_merge((array) $options['constraints'], [new NotBlank()]);
 
         return $this->changeWidgetOptions($widget, $options);
@@ -92,7 +99,6 @@ class DependencyListener implements EventSubscriberInterface
         $options = $config->getOptions();
         $options['required'] = false;
 
-        // don't duplicate constraints
         foreach ($options['constraints'] as $key => $existingConstraint) {
             if ($existingConstraint instanceof NotBlank) {
                 unset($options['constraints'][$key]);
@@ -100,7 +106,15 @@ class DependencyListener implements EventSubscriberInterface
             }
         }
 
-        return $this->changeWidgetOptions($widget, $options);
+        $widget = $this->changeWidgetOptions($widget, $options); // change current form field
+
+        // un-require children
+        foreach ($widget as $field) { /** @var FormInterface $field */
+            if ($dependency = $field->getConfig()->getOption('depends_on')) { /** @var Dependency $dependency */
+                //$dependency->setRequired(false); // ensure that next listener doesn't require this field again.
+            }
+            //$this->removeConstraint($field);
+        }
     }
 
     /**
@@ -126,19 +140,9 @@ class DependencyListener implements EventSubscriberInterface
         );
 
         $widget = $form->get($widget->getName()); /** @var FormInterface $child */
-        $required = $this->isWidgetRequired($widget);
 
         foreach ($children as $child) {
             $widget->add($child);
-
-            $child = $widget->get($child->getName());
-            $type = $child->getConfig()->getType()->getName();
-
-            if ($required && !in_array($type, ['radio', 'select', 'checkbox'])) {
-                $this->addConstraint($child);
-            } else {
-                $this->removeConstraint($child);
-            }
         }
 
         return $widget;

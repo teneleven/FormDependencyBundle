@@ -15,18 +15,21 @@ use Teneleven\Bundle\FormDependencyBundle\Form\Dependency;
 class DependencyListener implements EventSubscriberInterface
 {
     /**
-     * Add new validation constraints.
+     * Resolves dependencies between fields.
      *
      * @param FormEvent $event
      */
     public function handleDependencies(FormEvent $event)
     {
         $form = $event->getForm();
-        $data = (array) $event->getData();
+
+        if (!$form->getConfig()->getOption('compound')) {
+            return;
+        }
 
         foreach ($form as $field) { /** @var FormInterface $field */
             if ($field->getConfig()->hasOption('depends_on')) {
-                $this->processDependency($field, $data);
+                $this->processDependency($field, $event->getData());
             }
         }
     }
@@ -37,7 +40,6 @@ class DependencyListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SET_DATA => 'handleDependencies',
             FormEvents::PRE_SUBMIT => 'handleDependencies',
         ];
     }
@@ -48,6 +50,7 @@ class DependencyListener implements EventSubscriberInterface
     protected function processDependency(FormInterface $widget, $data)
     {
         $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
+
         if ($dependency->isRequired() && $this->dependencyMatches($dependency, $data)) {
             $this->addConstraint($widget);
         } else {
@@ -109,11 +112,11 @@ class DependencyListener implements EventSubscriberInterface
         $widget = $this->changeWidgetOptions($widget, $options); // change current form field
 
         // un-require children
-        foreach ($widget as $field) { /** @var FormInterface $field */
+        foreach ($widget->all() as $field) { /** @var FormInterface $field */
             if ($dependency = $field->getConfig()->getOption('depends_on')) { /** @var Dependency $dependency */
-                //$dependency->setRequired(false); // ensure that next listener doesn't require this field again.
+                $dependency->setRequired(false); // ensure that next listener doesn't require this field again.
             }
-            //$this->removeConstraint($field);
+            $this->removeConstraint($field);
         }
     }
 
@@ -153,7 +156,7 @@ class DependencyListener implements EventSubscriberInterface
      *
      * @return boolean
      */
-    public function isWidgetRequired(FormInterface $widget)
+    protected function isWidgetRequired(FormInterface $widget)
     {
         foreach ($widget->getConfig()->getOptions()['constraints'] as $existingConstraint) {
             if ($existingConstraint instanceof NotBlank) {

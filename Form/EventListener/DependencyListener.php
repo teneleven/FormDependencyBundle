@@ -50,7 +50,6 @@ class DependencyListener implements EventSubscriberInterface
     protected function processDependency(FormInterface $widget, $data)
     {
         $dependency = $widget->getConfig()->getOption('depends_on'); /** @var Dependency $dependency */
-
         if ($dependency->isRequired() && $this->dependencyMatches($dependency, $data)) {
             $this->addConstraint($widget);
         } else {
@@ -60,14 +59,14 @@ class DependencyListener implements EventSubscriberInterface
 
     /**
      * @param Dependency $dependency
-     * @param array $data
+     * @param array      $data
+     *
      * @return bool
      */
     protected function dependencyMatches(Dependency $dependency, array $data)
     {
         return array_key_exists($dependency->getField(), $data) && $dependency->matches($data[$dependency->getField()]);
     }
-
 
     /**
      * Add required constraint to a form child.
@@ -113,7 +112,7 @@ class DependencyListener implements EventSubscriberInterface
 
         // un-require children
         foreach ($widget->all() as $field) { /** @var FormInterface $field */
-            if ($dependency = $field->getConfig()->getOption('depends_on')) { /** @var Dependency $dependency */
+            if ($dependency = $field->getConfig()->getOption('depends_on')) { /* @var Dependency $dependency */
                 $dependency->setRequired(false); // ensure that next listener doesn't require this field again.
             }
             $this->removeConstraint($field);
@@ -143,7 +142,6 @@ class DependencyListener implements EventSubscriberInterface
         );
 
         $widget = $form->get($widget->getName()); /** @var FormInterface $child */
-
         foreach ($children as $child) {
             $widget->add($child);
         }
@@ -154,7 +152,7 @@ class DependencyListener implements EventSubscriberInterface
     /**
      * @param FormInterface $widget
      *
-     * @return boolean
+     * @return bool
      */
     protected function isWidgetRequired(FormInterface $widget)
     {

@@ -42,6 +42,11 @@ final class DependencyExtension extends AbstractTypeExtension
             }
 
             $dependency = $field->getConfig()->getOption('depends_on'); /* @var Dependency $dependency */
+
+            if (!isset($view->children[$dependency->getField()])) {
+                throw new \RuntimeException(sprintf('Dependent field "%s" does not exist.', $dependency->getField()));
+            }
+
             $dependentView = $view->children[$dependency->getField()];
 
             $dependentName = $dependentView->vars['full_name'];

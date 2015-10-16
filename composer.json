@@ -1,0 +1,14 @@
+{
+  "name": "teneleven/form-dependency-bundle",
+  "description": "Manages dependencies between Symfony form fields",
+  "keywords": ["symfony", "form"],
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "require": {
+    "symfony/form": ">=2.3"
+  },
+  "autoload": {
+    "psr-0": { "Teneleven\\Bundle\\FormDependencyBundle": "" }
+  },
+  "target-dir": "Teneleven/Bundle/FormDependencyBundle"
+}
